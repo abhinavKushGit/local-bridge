@@ -8,6 +8,7 @@ import { pool } from './config';
 import { connectRedis } from './config/redis';
 import { initFirebase } from './config/firebase';
 import { initSockets } from './sockets';
+import { startAllJobs } from './jobs/scheduler';
 import logger from './utils/logger';
 
 const PORT = process.env.PORT || 3000;
@@ -22,13 +23,15 @@ const startServer = async () => {
 
     const server = http.createServer(app);
 
-    // Wire socket.io to the HTTP server
     const io = new Server(server, {
       cors: { origin: '*', methods: ['GET', 'POST'] },
       transports: ['websocket', 'polling'],
     });
 
     initSockets(io);
+
+    // Start all background jobs
+    startAllJobs();
 
     server.listen(PORT, () => {
       logger.info(`LocalBridge API running on port ${PORT}`);
