@@ -7,6 +7,7 @@ import usersRoutes from './v1/users.routes';
 import notificationsRoutes from './v1/notifications.routes';
 import categoriesRoutes from './v1/categories.routes';
 import ratingsRoutes from './v1/ratings.routes';
+import adminRoutes from './v1/admin.routes';
 
 const router = Router();
 
@@ -18,6 +19,7 @@ router.use('/users', usersRoutes);
 router.use('/notifications', notificationsRoutes);
 router.use('/categories', categoriesRoutes);
 router.use('/ratings', ratingsRoutes);
+router.use('/admin', adminRoutes);
 
 router.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

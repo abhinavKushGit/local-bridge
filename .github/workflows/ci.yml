@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:15-3.3
+        env:
+          POSTGRES_USER: localbridge
+          POSTGRES_PASSWORD: localbridge123
+          POSTGRES_DB: localbridge_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: Install deps
+        run: cd backend && npm ci
+      - name: Run tests
+        run: cd backend && npm test
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://localbridge:localbridge123@localhost:5432/localbridge_dev
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test_secret
+          DEV_MODE_OTP: 'true'
