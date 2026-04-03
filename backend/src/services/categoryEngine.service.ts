@@ -6,7 +6,7 @@ import { query } from '../config/database';
 import logger from '../utils/logger';
 
 // In dev mode use 3 searches, in production use 50
-const VOTE_THRESHOLD = process.env.DEV_MODE_OTP === 'true' ? 3 : 50;
+const VOTE_THRESHOLD = process.env.DEV_MODE_OTP === 'true' ? 1 : 50;
 
 export const CategoryEngineService = {
 
@@ -94,7 +94,7 @@ export const CategoryEngineService = {
     const totalVotes = counts.yes + counts.no;
     const yesPercent = totalVotes > 0 ? (counts.yes / totalVotes) * 100 : 0;
     const votingEnded = new Date() > new Date(category.vote_ends_at);
-    const strongYes = counts.yes >= 10 && yesPercent >= 60;
+    const strongYes = process.env.DEV_MODE_OTP === 'true' ? counts.yes >= 1 : (counts.yes >= 10 && yesPercent >= 60);
 
     let activated = false;
 
